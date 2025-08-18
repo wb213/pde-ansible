@@ -1,0 +1,7 @@
+# Personal Development Environment - FZF Configuration
+# Fuzzy finder integration
+
+zinit ice as"command" from"gh-r" \
+          atclone"./fzf --zsh > init.zsh" \
+          atpull"%atclone" src"init.zsh"
+zinit light junegunn/fzf

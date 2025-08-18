@@ -1,0 +1,26 @@
+---
+# Manual Zinit installation (template-managed, no .zshrc modification)
+
+- name: Create zinit directories
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/zinit"
+    state: directory
+    mode: "0755"
+
+- name: Check if Zinit repository exists
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/share/zinit/zinit.git/zinit.zsh"
+  register: zinit_installed
+
+- name: Clone Zinit repository (manual installation)
+  git:
+    repo: https://github.com/zdharma-continuum/zinit.git
+    dest: "{{ ansible_env.HOME }}/.local/share/zinit/zinit.git"
+    version: HEAD
+  when: not zinit_installed.stat.exists
+
+- name: Verify Zinit installation
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/share/zinit/zinit.git/zinit.zsh"
+  register: zinit_verify
+  failed_when: not zinit_verify.stat.exists

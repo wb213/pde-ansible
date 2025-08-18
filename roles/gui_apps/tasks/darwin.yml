@@ -1,0 +1,14 @@
+---
+# macOS GUI Applications Setup
+
+- name: Include macOS GUI applications variables
+  include_vars: darwin.yml
+
+- name: Install GUI applications via Homebrew (macOS)
+  community.general.homebrew_cask:
+    name: "{{ gui_apps_casks }}"
+    state: present
+  register: gui_apps_result
+
+- name: Deploy GUI application configurations
+  include_tasks: config.yml

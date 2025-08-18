@@ -1,0 +1,15 @@
+---
+# RHEL/Fedora language development packages
+# Programming language runtimes and development tools
+
+languages_packages:
+  - golang                        # Go programming language
+  - java-17-amazon-corretto-devel # Amazon Corretto 17 LTS with dev tools
+  - python3                       # Python 3 runtime
+  - python3-devel                 # Python 3 development headers
+  - python3-pip                   # Python package installer
+  
+# Note: Node.js is handled via NVM installation, not package manager  
+# Corretto requires adding Amazon's repository first (handled in repositories.yml)
+# UV (Python package manager) may need to be installed via pip or cargo
+# Rust is installed via rustup (handled in rust.yml task)

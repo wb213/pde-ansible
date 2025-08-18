@@ -1,0 +1,9 @@
+---
+# GUI Applications Configuration Deployment
+
+- name: Deploy WezTerm configuration
+  copy:
+    src: wezterm.lua
+    dest: "{{ ansible_env.HOME }}/.wezterm.lua"
+    mode: "0644"
+    backup: true

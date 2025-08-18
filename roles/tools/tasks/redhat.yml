@@ -1,0 +1,20 @@
+---
+# RHEL/Fedora-specific tools installation and configuration
+
+- name: Include platform-specific tool variables
+  include_vars: "{{ ansible_os_family | lower }}.yml"
+
+- name: Install tools via DNF (RHEL/Fedora)
+  dnf:
+    name: "{{ tools_packages }}"
+    state: present
+  become: true
+
+- name: Setup Git configuration
+  include_tasks: git.yml
+
+- name: Setup AI CLI tools
+  include_tasks: ai_tools.yml
+
+- name: Setup tool configurations
+  include_tasks: configs.yml

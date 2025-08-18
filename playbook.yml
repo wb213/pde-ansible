@@ -1,0 +1,247 @@
+---
+- name: Personal Development Environment Setup
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: false
+
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: Verify supported platform
+      fail:
+        msg: "Unsupported platform: {{ ansible_os_family }}. Supported: Darwin, RedHat, Debian"
+      when: ansible_os_family not in ['Darwin', 'RedHat', 'Debian']
+
+    - name: Display setup information and Manual confirmation before proceeding
+      pause:
+        prompt: |
+          🚀 Setting up Personal Development Environment
+
+          User: {{ ansible_user_id }}
+          Platform: {{ ansible_os_family }}
+          Distribution: {{ ansible_distribution }}
+          Package Manager: {{ ansible_pkg_mgr }}
+          Home Directory: {{ ansible_env.HOME }}
+          Git User: {{ git_user_name }} <{{ git_user_email }}>
+          Setup China Mirrors: {{ use_china_mirrors }}
+          Install Rust: {{ install_rust }}
+
+          ⚠️  Please review the setup information above carefully.
+
+          This playbook will:
+          • Install/update packages via {{ ansible_pkg_mgr }}
+          • Configure shell environment (zsh + nushell)
+          • Install development tools and languages
+          • Deploy configuration files to your home directory
+          • Potentially overwrite existing configurations
+
+          Type 'yes' to continue, or 'no' to abort
+      register: user_confirmation
+
+    - name: Validate user confirmation
+      fail:
+        msg: |
+          ❌ Setup aborted by user.
+
+          To proceed, you must type 'yes' (case-sensitive).
+          If you want to continue, please run the playbook again.
+
+          Your input was: '{{ user_confirmation.user_input | default("") }}'
+      when: (user_confirmation.user_input | default("")) != "yes"
+
+    # Configure pip and uv mirrors for faster downloads (optional)
+    - name: Configure pip to use Tsinghua mirror
+      shell: |
+        python3 -m pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+      register: pip_config
+      changed_when: true
+      failed_when: pip_config.rc != 0
+      when: use_china_mirrors | default(false)
+
+    - name: Create uv config directory
+      file:
+        path: "{{ ansible_env.HOME }}/.config/uv"
+        state: directory
+        mode: "0755"
+      when: use_china_mirrors | default(false)
+
+    - name: Configure uv to use Tsinghua mirror
+      copy:
+        content: |
+          [[index]]
+          url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/"
+          default = true
+        dest: "{{ ansible_env.HOME }}/.config/uv/uv.toml"
+        mode: "0644"
+        backup: true
+      when: use_china_mirrors | default(false)
+
+    # Package Manager Setup (Prerequisites)
+    - name: Check if Homebrew is installed (macOS)
+      command: which brew
+      register: homebrew_check
+      failed_when: false
+      changed_when: false
+      when: ansible_os_family == "Darwin"
+
+    - name: Install Homebrew (macOS)
+      shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      when: ansible_os_family == "Darwin" and homebrew_check.rc != 0
+      register: homebrew_install
+      failed_when: homebrew_install.rc != 0
+
+    - name: Update Homebrew to latest (macOS)
+      community.general.homebrew:
+        update_homebrew: true
+      when: ansible_os_family == "Darwin"
+
+    - name: Update package cache (Linux)
+      package:
+        update_cache: true
+      become: true
+      when: ansible_os_family in ['RedHat', 'Debian']
+      register: cache_update
+      failed_when: cache_update.failed
+
+    - name: Enable EPEL repository (RHEL/CentOS)
+      package:
+        name: epel-release
+        state: present
+      become: true
+      when: ansible_distribution in ['RedHat', 'CentOS']
+      register: epel_install
+      failed_when: epel_install.failed
+
+  roles:
+    - role: package_manager # Package management (homebrew/dnf/apt)
+      tags: package_manager
+    - role: shell # Shell environment (zsh, zinit)
+      tags: shell
+    - role: tools # Development tools (helix, zellij, yazi) + Git config
+      tags: tools
+    - role: languages # Development languages (NVM, Go, Java)
+      tags: languages
+    - role: gui_apps # GUI applications and fonts (macOS only)
+      tags: gui_apps
+
+  post_tasks:
+    - name: Verify critical tools installation
+      command: "{{ item.command }}"
+      register: tool_check
+      failed_when: tool_check.rc != 0
+      changed_when: false
+      loop:
+        - { name: "Zsh", command: "zsh --version" }
+        - { name: "Git", command: "git --version" }
+        - { name: "Starship", command: "starship --version" }
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Generate PDE baseline snapshot for drift detection
+      shell: |
+        {
+          echo "# PDE Baseline Snapshot - Generated $(date)"
+          echo "# Platform: {{ ansible_os_family }}"
+          echo "# Distribution: {{ ansible_distribution }}"
+          echo "# User: {{ ansible_user_id }}"
+          echo "# Home: {{ ansible_env.HOME }}"
+          echo ""
+
+          echo "=== HOMEBREW_PACKAGES ==="
+          {% if ansible_os_family == "Darwin" %}
+          brew list --formula | sort
+          {% endif %}
+
+          echo "=== HOMEBREW_CASKS ==="
+          {% if ansible_os_family == "Darwin" %}
+          brew list --cask | sort
+          {% endif %}
+
+          echo "=== HOMEBREW_TAPS ==="
+          {% if ansible_os_family == "Darwin" %}
+          brew tap | sort
+          {% endif %}
+
+          echo "=== DNF_PACKAGES ==="
+          {% if ansible_os_family == "RedHat" %}
+          dnf list installed | awk 'NR>1 {print $1}' | sort
+          {% endif %}
+
+          echo "=== APT_PACKAGES ==="
+          {% if ansible_os_family == "Debian" %}
+          dpkg-query -W -f='${Package}\n' | sort
+          {% endif %}
+
+          echo "=== MANAGED_DOTFILES ==="
+          # Files that this playbook manages
+          echo ".zshrc"
+          echo ".zprofile"
+          echo ".gitconfig"
+          echo ".config/starship.toml"
+          echo ".config/zellij/config.kdl"
+          echo ".config/helix/config.toml"
+          echo ".config/yazi/yazi.toml"
+
+          echo "=== MANAGED_DIRECTORIES ==="
+          echo ".config/zellij"
+          echo ".config/helix"
+          echo ".config/yazi"
+          echo ".local/share/zinit"
+
+          echo "=== GIT_CONFIG ==="
+          git config --list 2>/dev/null | grep -E "^(user\.|core\.)" | sort || true
+
+          echo "=== SHELL_CONFIG ==="
+          echo "default_shell:$(echo $SHELL)"
+          echo "zinit_installed:$([ -d ~/.local/share/zinit ] && echo yes || echo no)"
+          echo "starship_installed:$(command -v starship >/dev/null && echo yes || echo no)"
+
+          echo "=== TOOL_VERSIONS ==="
+          for tool in helix zellij yazi eza bat fd rg fzf jq; do
+            if command -v "$tool" >/dev/null 2>&1; then
+              version=$("$tool" --version 2>/dev/null | head -1 || echo "unknown")
+              echo "$tool:$version"
+            fi
+          done
+
+          echo "=== FILE_CHECKSUMS ==="
+          for file in ~/.zshrc ~/.gitconfig ~/.config/starship.toml; do
+            if [ -f "$file" ]; then
+              echo "$(basename "$file"):$(md5 -q "$file" 2>/dev/null || md5sum "$file" 2>/dev/null | cut -d' ' -f1)"
+            fi
+          done
+
+        } > ~/.pde-baseline.txt
+      args:
+        executable: /bin/bash
+      tags: baseline
+
+    - name: PDE Setup Complete
+      pause:
+        prompt: |
+          
+          ✅ Personal Development Environment setup completed successfully!
+
+          Installed and configured:
+          - Package manager ({{ ansible_pkg_mgr }})
+          - Shell environment (Zsh + Zinit + plugins)
+          - Modern development tools
+          - Configuration files and dotfiles
+
+          📊 Baseline snapshot created: ~/.pde-baseline.txt
+          
+          🚀 Restart your terminal or run: source ~/.zshrc
+          🔍 Use './check-drift.sh' to detect configuration drift
+
+          Next steps:
+          1. Restart your terminal or run: source ~/.zshrc
+          2. Zinit plugins will install automatically on first zsh startup
+          3. Run 'zinit self-update' after installing and reloading the shell
+          3. Run 'refresh' function to update everything
+          4. Run './check-drift.sh' anytime to check for drift
+
+          Enjoy your new development environment! 🎉
+
+          Press ENTER to continue.

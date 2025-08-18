@@ -1,0 +1,35 @@
+---
+# Debian/Ubuntu-specific language environment setup
+
+- name: Setup language package repositories
+  include_tasks: repositories.yml
+
+- name: Include platform-specific language variables
+  include_vars: "{{ ansible_os_family | lower }}.yml"
+
+- name: Install language packages via APT (Debian/Ubuntu)
+  apt:
+    name: "{{ languages_packages }}"
+    state: present
+    update_cache: true
+  become: true
+  when: languages_packages is defined
+
+- name: Install Node.js environment (NVM)
+  include_tasks: nodejs.yml
+
+- name: Setup Go language environment
+  include_tasks: golang.yml
+
+- name: Setup Java (Corretto) environment
+  include_tasks: java.yml
+
+- name: Setup Python tooling environment
+  include_tasks: python.yml
+
+- name: Setup Rust tooling environment (optional)
+  include_tasks: rust.yml
+  when: install_rust | default(false)
+
+- name: Setup language-specific configurations
+  include_tasks: configs.yml

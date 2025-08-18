@@ -1,0 +1,39 @@
+---
+# Debian/Ubuntu-specific shell setup
+
+- name: Set zsh as default shell (Linux only)
+  user:
+    name: "{{ ansible_user_id }}"
+    shell: /usr/bin/zsh
+  become: true
+- name: Create shell configuration directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ ansible_env.HOME }}/.local/share"
+    - "{{ ansible_env.HOME }}/.local/share/zinit"
+
+- name: Install Zinit (Zsh plugin manager)
+  include_tasks: zinit.yml
+
+- name: Install nushell from APT
+  apt:
+    name: nushell
+    state: present
+  become: true
+- name: Verify nushell installation
+  command: which nu
+  register: nu_location
+  ignore_errors: true
+
+- name: Create nushell config directory (for future use)
+  file:
+    path: "{{ ansible_env.HOME }}/.config/nushell"
+    state: directory
+    mode: '0755'
+  when: nu_location.rc == 0
+
+- name: Deploy shell configuration files
+  include_tasks: config.yml

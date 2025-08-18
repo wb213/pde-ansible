@@ -1,0 +1,17 @@
+---
+- name: Add additional PPAs if needed
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  become: true
+  loop: "{{ additional_ppas | default([]) }}"
+
+- name: Update APT cache
+  apt:
+    update_cache: true
+  become: true
+- name: Install packages via APT
+  apt:
+    name: "{{ linux_packages }}"
+    state: present
+  become: true

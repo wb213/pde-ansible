@@ -1,0 +1,106 @@
+---
+# Rust tooling environment setup (Homebrew on macOS, rustup on Linux)
+
+- name: Check if Rust is installed via Homebrew (macOS)
+  command: brew list rust
+  register: homebrew_rust_check
+  failed_when: false
+  changed_when: false
+  when: ansible_os_family == "Darwin"
+
+- name: Check if rustup is installed via Homebrew (macOS)
+  command: brew list rustup
+  register: homebrew_rustup_check
+  failed_when: false
+  changed_when: false
+  when: ansible_os_family == "Darwin"
+
+- name: Check if rustup is installed (Linux)
+  command: rustup --version
+  register: rustup_check
+  failed_when: false
+  changed_when: false
+  when: ansible_os_family != "Darwin"
+
+- name: Check if Rust is installed
+  command: rustc --version
+  register: rust_check
+  failed_when: false
+  changed_when: false
+
+- name: Install rustup via Homebrew (macOS)
+  homebrew:
+    name: rustup
+    state: present
+  when: 
+    - ansible_os_family == "Darwin"
+    - homebrew_rustup_check.rc != 0
+
+- name: Install rustup (Rust toolchain installer) on Linux
+  shell: |
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+  args:
+    creates: "{{ ansible_env.HOME }}/.cargo/bin/rustup"
+  when: 
+    - ansible_os_family != "Darwin"
+    - rustup_check.rc != 0
+
+- name: Set default Rust toolchain (one-time setup)
+  shell: |
+    export PATH="{{ ansible_env.HOME }}/.cargo/bin:${PATH}"
+    {% if ansible_os_family == "Darwin" %}
+    if command -v brew >/dev/null 2>&1 && brew list rustup >/dev/null 2>&1; then
+        export PATH="$(brew --prefix rustup)/bin:${PATH}"
+    fi
+    {% endif %}
+    if command -v rustup >/dev/null 2>&1; then
+        if ! rustup toolchain list | grep -q "(default)"; then
+            rustup default stable
+        fi
+    fi
+  register: rustup_default_result
+  changed_when: "'installed' in rustup_default_result.stdout or 'downloading' in rustup_default_result.stdout"
+  when: rust_check.rc != 0 or (ansible_os_family == "Darwin" and homebrew_rustup_check.rc != 0)
+
+- name: Set Rust environment variables in shell config
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.config/zsh/conf_55_rust.zsh"
+    create: true
+    block: |
+      # Rust development environment
+      {% if ansible_os_family == "Darwin" %}
+      # macOS: Using Homebrew-managed Rust and rustup
+      export CARGO_HOME="${HOME}/.cargo"
+      export RUSTUP_HOME="${HOME}/.rustup"
+      
+      # Ensure rustup is in PATH before rust (Homebrew caveat)
+      # This handles the case where both rust and rustup are installed via Homebrew
+      if command -v brew >/dev/null 2>&1 && brew list rustup >/dev/null 2>&1; then
+          export PATH="$(brew --prefix rustup)/bin:${PATH}"
+      fi
+      
+      # Add cargo bin to PATH for user-installed tools
+      export PATH="${CARGO_HOME}/bin:${PATH}"
+      {% else %}
+      # Linux: Using rustup-managed Rust
+      export CARGO_HOME="${HOME}/.cargo"
+      export RUSTUP_HOME="${HOME}/.rustup"
+      export PATH="${CARGO_HOME}/bin:${PATH}"
+      {% endif %}
+      
+      # Rust development aliases
+      alias c="cargo"
+      alias cb="cargo build"
+      alias cr="cargo run"
+      alias ct="cargo test"
+      alias cc="cargo check"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Rust Environment"
+
+- name: Create Rust development directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ ansible_env.HOME }}/.config/rust"
+    - "{{ ansible_env.HOME }}/dev/rust"

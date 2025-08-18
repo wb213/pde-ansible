@@ -1,0 +1,21 @@
+---
+# Debian/Ubuntu-specific tools installation and configuration
+
+- name: Include platform-specific tool variables
+  include_vars: "{{ ansible_os_family | lower }}.yml"
+
+- name: Install tools via APT (Debian/Ubuntu)
+  apt:
+    name: "{{ tools_packages }}"
+    state: present
+    update_cache: true
+  become: true
+
+- name: Setup Git configuration
+  include_tasks: git.yml
+
+- name: Setup AI CLI tools
+  include_tasks: ai_tools.yml
+
+- name: Setup tool configurations
+  include_tasks: configs.yml

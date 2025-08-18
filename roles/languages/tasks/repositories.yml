@@ -1,0 +1,34 @@
+---
+# Setup repositories for language packages
+
+- name: Add Amazon Corretto repository (RHEL/Fedora)
+  yum_repository:
+    name: corretto
+    description: Amazon Corretto
+    baseurl: https://yum.corretto.aws/corretto.repo
+    gpgcheck: true
+    enabled: true
+  become: true
+  when: ansible_os_family == "RedHat"
+
+- name: Add Amazon Corretto GPG key (RHEL/Fedora)
+  rpm_key:
+    key: https://yum.corretto.aws/corretto.key
+    state: present
+  become: true
+  when: ansible_os_family == "RedHat"
+
+- name: Add Amazon Corretto repository (Debian/Ubuntu)
+  apt_repository:
+    repo: "deb https://apt.corretto.aws stable main"
+    state: present
+    update_cache: true
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: Add Amazon Corretto GPG key (Debian/Ubuntu)
+  apt_key:
+    url: https://apt.corretto.aws/corretto.key
+    state: present
+  become: true
+  when: ansible_os_family == "Debian"

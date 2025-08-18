@@ -1,0 +1,14 @@
+---
+# Development Tools Role - Modern CLI tools and Git configuration
+
+- name: Setup macOS tools
+  include_tasks: darwin.yml
+  when: ansible_os_family == "Darwin"
+
+- name: Setup RHEL/Fedora tools
+  include_tasks: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Setup Debian/Ubuntu tools
+  include_tasks: debian.yml
+  when: ansible_os_family == "Debian"

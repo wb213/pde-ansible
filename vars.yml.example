@@ -1,0 +1,28 @@
+---
+# Personal Development Environment Variables
+# Customize these values for your setup
+
+# Git Configuration (REQUIRED - Update with your information)
+git_user_name: "Your Full Name"
+git_user_email: "your.email@example.com"
+
+# Mirror Configuration (OPTIONAL)
+# Set to true to use China mirrors for faster downloads in China
+use_china_mirrors: false
+
+# Install Rust
+install_rust: false
+
+# Private shell configuration (OPTIONAL)
+# This content will be placed in ~/.config/zsh/private.zsh
+private_shell_config: |
+  # Add your private shell configurations here
+  # Examples:
+  # export SOME_PRIVATE_VAR="value"
+  # alias private-command="some command"
+
+  # Proxy function (referenced in zsh-functions.zsh)
+  function proxy() {
+    # Add your proxy configuration here if needed
+    echo "Proxy function - customize in vars.yml"
+  }

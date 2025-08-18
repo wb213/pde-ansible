@@ -1,0 +1,14 @@
+---
+# RHEL/Fedora modern development tools
+# CLI-focused tools for server/development environments
+
+tools_packages:
+  - git        # Latest Git version
+  - helix      # Modern text editor
+  - zellij     # Modern terminal multiplexer  
+  - yazi       # Terminal file manager
+  - eza        # Modern ls replacement
+  - direnv     # Environment variable management per directory
+  
+# Note: These tools may need to be installed via cargo or other methods
+# if not available in DNF repositories. Consider adding EPEL or other repos.

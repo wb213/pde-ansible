@@ -1,0 +1,14 @@
+---
+# Debian/Ubuntu modern development tools  
+# CLI-focused tools for server/development environments
+
+tools_packages:
+  - git        # Latest Git version
+  - helix      # Modern text editor (may need snap or cargo install)
+  - zellij     # Modern terminal multiplexer (may need cargo install)
+  - yazi       # Terminal file manager (may need cargo install)
+  - exa        # Modern ls replacement (note: 'exa' not 'eza' on older Ubuntu)
+  - direnv     # Environment variable management per directory
+  
+# Note: Some modern tools may not be available in standard APT repos
+# Consider using snap, cargo, or adding third-party repositories

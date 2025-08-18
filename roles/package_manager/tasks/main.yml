@@ -1,0 +1,17 @@
+---
+# Note: the packages installed in this role don't require additional conf setup
+
+- name: Include platform-specific package variables
+  include_vars: "{{ ansible_os_family | lower }}.yml"
+
+- name: Setup macOS packages (Homebrew)
+  include_tasks: darwin.yml
+  when: ansible_os_family == "Darwin"
+
+- name: Setup RHEL/Fedora packages (DNF)
+  include_tasks: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Setup Debian/Ubuntu packages (APT)
+  include_tasks: debian.yml
+  when: ansible_os_family == "Debian"

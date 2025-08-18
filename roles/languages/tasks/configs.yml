@@ -1,0 +1,28 @@
+---
+# Language-specific configuration setup
+
+- name: Create language configuration directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ ansible_env.HOME }}/.config/nodejs"
+    - "{{ ansible_env.HOME }}/.config/go"
+    - "{{ ansible_env.HOME }}/.config/java"
+    - "{{ ansible_env.HOME }}/.config/python"
+    - "{{ ansible_env.HOME }}/.config/rust"
+    - "{{ ansible_env.HOME }}/.config/zsh"
+
+- name: Create development workspace directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ ansible_env.HOME }}/dev"
+    - "{{ ansible_env.HOME }}/dev/go"
+    - "{{ ansible_env.HOME }}/dev/java"
+    - "{{ ansible_env.HOME }}/dev/python"
+    - "{{ ansible_env.HOME }}/dev/rust"
+    - "{{ ansible_env.HOME }}/dev/nodejs"

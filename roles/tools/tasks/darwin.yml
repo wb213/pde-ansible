@@ -1,0 +1,16 @@
+---
+# macOS-specific tools installation and configuration
+
+- name: Include platform-specific tool variables
+  include_vars: "{{ ansible_os_family | lower }}.yml"
+
+- name: Install tools via Homebrew (macOS)
+  community.general.homebrew:
+    name: "{{ tools_packages }}"
+    state: present
+
+- name: Setup Git configuration
+  include_tasks: git.yml
+
+- name: Setup tool configurations
+  include_tasks: configs.yml

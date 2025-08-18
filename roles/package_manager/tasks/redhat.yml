@@ -1,0 +1,13 @@
+---
+- name: Install additional repositories for modern tools
+  dnf:
+    name: "{{ item }}"
+    state: present
+  become: true
+  loop: "{{ additional_repos | default([]) }}"
+
+- name: Install packages via DNF
+  dnf:
+    name: "{{ linux_packages }}"
+    state: present
+  become: true

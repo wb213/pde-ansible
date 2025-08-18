@@ -1,0 +1,101 @@
+---
+# AI CLI Tools Installation
+# Cross-platform AI-powered command line tools
+
+# Gemini CLI Installation (via npm - preferred method)
+- name: Install Gemini CLI via npm (all platforms)
+  npm:
+    name: "@google/generative-ai-cli"
+    global: true
+    state: present
+  register: gemini_cli_result
+  failed_when: false
+
+# Claude Code CLI Installation (via npm - official method)
+- name: Install Claude Code CLI via npm
+  npm:
+    name: "@anthropic-ai/claude-code"
+    global: true
+    state: present
+  register: claude_code_result
+  failed_when: false
+
+# Amazon Q CLI Installation for Linux (macOS handled by gui_apps cask)
+- name: Check if Amazon Q CLI is already installed (Linux)
+  command: q --version
+  register: amazon_q_check
+  failed_when: false
+  changed_when: false
+  when: ansible_os_family in ["RedHat", "Debian"]
+
+- name: Install Amazon Q CLI on Ubuntu/Debian
+  block:
+    - name: Download Amazon Q CLI deb package
+      get_url:
+        url: "https://desktop-release.q.us-east-1.amazonaws.com/latest/amazon-q.deb"
+        dest: "/tmp/amazon-q.deb"
+        mode: "0644"
+
+    - name: Install Amazon Q CLI deb package
+      apt:
+        deb: "/tmp/amazon-q.deb"
+        state: present
+      become: true
+
+    - name: Clean up deb package
+      file:
+        path: "/tmp/amazon-q.deb"
+        state: absent
+  when: ansible_os_family == "Debian" and amazon_q_check.rc != 0
+
+- name: Install Amazon Q CLI on RHEL/Fedora (via zip)
+  block:
+    - name: Check glibc version
+      command: ldd --version
+      register: glibc_version
+      changed_when: false
+
+    - name: Set Amazon Q download URL based on architecture and glibc
+      set_fact:
+        amazon_q_url: >-
+          {%- if ansible_architecture == "x86_64" -%}
+            {%- if "2.34" in glibc_version.stdout or "2.35" in glibc_version.stdout or "2.36" in glibc_version.stdout or "2.37" in glibc_version.stdout or "2.38" in glibc_version.stdout -%}
+              https://desktop-release.q.us-east-1.amazonaws.com/latest/q-x86_64-linux.zip
+            {%- else -%}
+              https://desktop-release.q.us-east-1.amazonaws.com/latest/q-x86_64-linux-musl.zip
+            {%- endif -%}
+          {%- elif ansible_architecture == "aarch64" -%}
+            {%- if "2.34" in glibc_version.stdout or "2.35" in glibc_version.stdout or "2.36" in glibc_version.stdout or "2.37" in glibc_version.stdout or "2.38" in glibc_version.stdout -%}
+              https://desktop-release.q.us-east-1.amazonaws.com/latest/q-aarch64-linux.zip
+            {%- else -%}
+              https://desktop-release.q.us-east-1.amazonaws.com/latest/q-aarch64-linux-musl.zip
+            {%- endif -%}
+          {%- endif -%}
+
+    - name: Create temporary directory for Amazon Q CLI
+      tempfile:
+        state: directory
+        suffix: amazon_q_cli
+      register: temp_q_dir
+
+    - name: Download Amazon Q CLI zip
+      get_url:
+        url: "{{ amazon_q_url }}"
+        dest: "{{ temp_q_dir.path }}/q.zip"
+        mode: "0644"
+
+    - name: Extract Amazon Q CLI
+      unarchive:
+        src: "{{ temp_q_dir.path }}/q.zip"
+        dest: "{{ temp_q_dir.path }}"
+        remote_src: true
+    - name: Run Amazon Q CLI installer
+      command: "{{ temp_q_dir.path }}/q/install.sh"
+      environment:
+        HOME: "{{ ansible_env.HOME }}"
+
+    - name: Clean up temporary files
+      file:
+        path: "{{ temp_q_dir.path }}"
+        state: absent
+  when: ansible_os_family == "RedHat" and amazon_q_check.rc != 0

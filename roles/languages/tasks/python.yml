@@ -1,0 +1,48 @@
+---
+# Python tooling environment setup (UV-based)
+
+- name: Check Python installation
+  command: python3 --version
+  register: python_version_check
+  failed_when: false
+  changed_when: false
+
+- name: Check UV installation
+  command: uv --version
+  register: uv_version_check
+  failed_when: false
+  changed_when: false
+
+- name: Create Python development directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ ansible_env.HOME }}/.config/python"
+    - "{{ ansible_env.HOME }}/dev/python"
+
+- name: Set Python environment variables in shell config
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.config/zsh/conf_51_python.zsh"
+    create: true
+    block: |
+      # Python development environment
+      export PYTHONDONTWRITEBYTECODE=1
+      export PYTHONUNBUFFERED=1
+      
+      # UV Python package manager
+      export UV_CACHE_DIR="${HOME}/.cache/uv"
+      
+      # Python development aliases
+      alias py="python3"
+      alias pip="uv pip"
+      alias venv="uv venv"
+      alias uvx="uv tool run"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Python Environment"
+
+- name: Create UV cache directory
+  file:
+    path: "{{ ansible_env.HOME }}/.cache/uv"
+    state: directory
+    mode: '0755'

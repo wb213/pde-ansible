@@ -1,0 +1,30 @@
+---
+# macOS GUI Applications and Fonts
+# These are desktop applications and fonts that only make sense on macOS
+
+gui_apps_casks:
+  # Desktop Applications
+  - anki # Spaced repetition learning
+  - drawio # Diagram editor
+  - loop # Window management
+  - quickrecorder # Screen recording
+  - wireshark-app # Wireshark GUI
+
+  # Terminal
+  - ghostty # Modern terminal emulator
+  - wezterm # Terminal emulator
+
+  # AI tools
+  - amazon-q # Amazon Q Developer IDE
+  - claude-code
+  - cherry-studio # AI chat client
+
+  # Editor
+  - zed # Modern code editor
+  - kiro
+
+  # Development Fonts (Nerd Fonts)
+  - font-caskaydia-cove-nerd-font
+  - font-caskaydia-mono-nerd-font
+  - font-jetbrains-mono-nerd-font
+  - font-symbols-only-nerd-font

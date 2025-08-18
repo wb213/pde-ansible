@@ -1,0 +1,16 @@
+---
+# Debian/Ubuntu language development packages
+# Programming language runtimes and development tools
+
+languages_packages:
+  - golang-go                    # Go programming language
+  - java-17-amazon-corretto-jdk  # Amazon Corretto 17 LTS
+  - python3                      # Python 3 runtime
+  - python3-dev                  # Python 3 development headers
+  - python3-pip                  # Python package installer
+  - python3-venv                 # Python virtual environment support
+  
+# Note: Node.js is handled via NVM installation, not package manager
+# Corretto requires adding Amazon's repository first (handled in repositories.yml)
+# UV (Python package manager) may need to be installed via pip or cargo
+# Rust is installed via rustup (handled in rust.yml task)

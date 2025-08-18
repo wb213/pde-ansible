@@ -1,0 +1,8 @@
+# Personal Development Environment - Terraform Configuration
+# Terraform completion setup
+
+{% if ansible_os_family == "Darwin" %}
+complete -o nospace -C {{ brew_prefix }}/bin/terraform terraform
+{% else %}
+complete -o nospace -C terraform terraform
+{% endif %}

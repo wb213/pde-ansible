@@ -1,0 +1,42 @@
+---
+# Java (Amazon Corretto) environment setup
+
+- name: Check Java installation
+  command: java -version
+  register: java_version_check
+  failed_when: false
+  changed_when: false
+
+- name: Set Java environment variables in shell config (macOS)
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.config/zsh/conf_54_java.zsh"
+    create: true
+    block: |
+      # Java (Amazon Corretto) environment
+      export JAVA_HOME="$(/usr/libexec/java_home -v 17)"
+      export PATH="${JAVA_HOME}/bin:${PATH}"
+      
+      # Security setting for Log4j vulnerability
+      export JAVA_TOOLS_OPTIONS="-Dlog4j2.formatMsgNoLookups=true"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Java Environment"
+  when: ansible_os_family == "Darwin"
+
+- name: Set Java environment variables in shell config (Linux)
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.config/zsh/conf_54_java.zsh"
+    create: true
+    block: |
+      # Java (Amazon Corretto) environment
+      export JAVA_HOME="/usr/lib/jvm/java-17-amazon-corretto"
+      export PATH="${JAVA_HOME}/bin:${PATH}"
+      
+      # Security setting for Log4j vulnerability
+      export JAVA_TOOLS_OPTIONS="-Dlog4j2.formatMsgNoLookups=true"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Java Environment"
+  when: ansible_os_family != "Darwin"
+
+- name: Create Java configuration directory
+  file:
+    path: "{{ ansible_env.HOME }}/.config/java"
+    state: directory
+    mode: '0755'

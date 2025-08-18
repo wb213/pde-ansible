@@ -1,0 +1,9 @@
+---
+# macOS language development packages
+# Programming language runtimes and development tools
+
+languages_packages:
+  - go # Go programming language
+
+languages_casks:
+  - corretto@17 # Amazon Corretto 17 LTS (better than openjdk)

@@ -1,0 +1,7 @@
+# Personal Development Environment - Zoxide Configuration
+# Smart cd replacement
+
+zinit ice as"command" from"gh-r" \
+          atclone"./zoxide init zsh --cmd zz > init.zsh" \
+          atpull"%atclone" src"init.zsh"
+zinit light ajeetdsouza/zoxide

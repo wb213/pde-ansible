@@ -1,0 +1,40 @@
+---
+# Debian/Ubuntu foundation packages (APT) - Core system tools and infrastructure
+
+linux_packages:
+  # Core system utilities
+  - zsh                        # Z shell
+  - git                        # Version control
+  - curl                       # HTTP client
+  - wget                       # File downloader
+  - unzip                      # Archive extraction
+  - tar                        # Archive management
+  - tree                       # Directory tree display
+  
+  # Development infrastructure
+  - python3                    # Python runtime
+  - python3-pip               # Python package manager
+  
+  # CLI utilities available in repos
+  - bat                        # Better cat
+  - fd-find                    # Better find
+  - ripgrep                    # Better grep
+  - jq                         # JSON processor
+  - fzf                        # Fuzzy finder
+  
+  # Cloud and infrastructure tools
+  - awscli                     # AWS CLI
+  - gemini-cli
+  # Build tools and libraries
+  - build-essential            # Essential build tools (gcc, make, etc.)
+  - cmake                      # Cross-platform build system
+  - pkg-config                 # Package configuration tool
+  - libssl-dev                 # SSL development libraries
+  - libffi-dev                 # Foreign function interface
+
+# Additional PPAs that might be needed
+additional_ppas: []
+
+# Note: Domain-specific packages are now managed by their respective roles:
+# - helix, zellij, yazi, eza (tools role)
+# - golang-go, openjdk-17-jdk (languages role)

@@ -1,0 +1,43 @@
+---
+# Go language environment setup
+
+- name: Create Go workspace directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ ansible_env.HOME }}/go"
+    - "{{ ansible_env.HOME }}/go/src"
+    - "{{ ansible_env.HOME }}/go/bin"
+    - "{{ ansible_env.HOME }}/go/pkg"
+
+- name: Check Go installation
+  command: go version
+  register: go_version_check
+  failed_when: false
+  changed_when: false
+
+- name: Set Go environment variables in shell config
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.config/zsh/conf_53_go.zsh"
+    create: true
+    block: |
+      # Go language environment
+      export GOPATH="${HOME}/go"
+      export GOROOT="$(brew --prefix)/opt/go/libexec"
+      export PATH="${GOPATH}/bin:${GOROOT}/bin:${PATH}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Go Environment"
+  when: ansible_os_family == "Darwin"
+
+- name: Set Go environment variables in shell config (Linux)
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.config/zsh/conf_53_go.zsh"
+    create: true
+    block: |
+      # Go language environment
+      export GOPATH="${HOME}/go"
+      export GOROOT="/usr/local/go"
+      export PATH="${GOPATH}/bin:${GOROOT}/bin:${PATH}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Go Environment"
+  when: ansible_os_family != "Darwin"

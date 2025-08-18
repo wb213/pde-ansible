@@ -1,0 +1,38 @@
+---
+# macOS Homebrew foundation packages - Core system tools and applications
+# Domain-specific packages (tools, languages) are handled by their respective roles
+
+homebrew_taps:
+  - hashicorp/tap
+  - lihaoyun6/tap
+  - noahgorstein/tap
+  - peak/tap
+
+# Foundation system packages - core utilities and infrastructure
+homebrew_packages:
+  - ansible # Infrastructure automation
+  - awscli # AWS command line interface
+  - bat # Better cat with syntax highlighting
+  - cloud-nuke # AWS resource cleanup
+  - fastfetch # System information display
+  - fd # Better find
+  - ffmpeg # Media processing
+  - gpgme # GPG encryption
+  - hashicorp/tap/terraform # Infrastructure as code
+  - jq # JSON processor
+  - kubernetes-cli # Kubernetes command line
+  - neovim # Text editor (legacy, will be replaced by helix)
+  - noahgorstein/tap/jqp # Interactive jq
+  - pandoc # Document converter
+  - peak/tap/s5cmd # S3 command line tool
+  - ripgrep # Better grep
+  - rmlint # Duplicate file finder
+  - rust # Rust programming language and toolchain
+  - rustup # Rust toolchain installer and version manager
+  - tmux # Terminal multiplexer (legacy, will be replaced by zellij)
+  - trash-cli # Safe file deletion
+  - unar # Archive extraction
+  - uv # Python package manager
+  - wget # File downloader
+  - yt-dlp # YouTube downloader
+  - gemini-cli

@@ -1,0 +1,6 @@
+---
+# GUI Applications Role - macOS Desktop Applications and Fonts
+
+- name: Setup macOS GUI applications and fonts
+  include_tasks: darwin.yml
+  when: ansible_os_family == "Darwin"

@@ -1,0 +1,14 @@
+---
+# Platform detection and delegation for languages role
+
+- name: Setup macOS language environment
+  include_tasks: darwin.yml
+  when: ansible_os_family == "Darwin"
+
+- name: Setup RHEL/Fedora language environment
+  include_tasks: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Setup Debian/Ubuntu language environment
+  include_tasks: debian.yml
+  when: ansible_os_family == "Debian"

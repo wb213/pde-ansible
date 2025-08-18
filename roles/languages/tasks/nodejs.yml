@@ -1,0 +1,49 @@
+---
+# Node.js Environment Setup via NVM (Manual Installation)
+# Following the same pattern as Zinit - no automatic shell modification
+
+- name: Check if NVM repository exists
+  stat:
+    path: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+  register: nvm_installed
+
+- name: Clone NVM repository (manual installation)
+  git:
+    repo: https://github.com/nvm-sh/nvm.git
+    dest: "{{ ansible_env.HOME }}/.nvm"
+    version: v0.40.3
+  when: not nvm_installed.stat.exists
+
+- name: Verify NVM installation
+  stat:
+    path: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+  register: nvm_verify
+  failed_when: not nvm_verify.stat.exists
+
+- name: Deploy NVM zsh configuration
+  template:
+    src: nvm.zsh.j2
+    dest: "{{ ansible_env.HOME }}/.config/zsh/conf_52_nvm.zsh"
+    mode: "0644"
+
+- name: Check if Node.js 18.13.0 is installed
+  shell: |
+    source {{ ansible_env.HOME }}/.nvm/nvm.sh
+    nvm list | grep -q "v18.13.0"
+  register: node18_check
+  failed_when: false
+  changed_when: false
+
+- name: Install Node.js 18.13.0 via NVM
+  shell: |
+    source {{ ansible_env.HOME }}/.nvm/nvm.sh
+    nvm install 18.13.0
+  when: node18_check.rc != 0
+  failed_when: false
+
+- name: Set default Node.js version to 18.13.0
+  shell: |
+    source {{ ansible_env.HOME }}/.nvm/nvm.sh
+    nvm alias default 18.13.0
+  changed_when: true
+  failed_when: false

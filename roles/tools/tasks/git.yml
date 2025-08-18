@@ -1,0 +1,25 @@
+---
+# Git Configuration Setup
+# Configures Git user settings and global ignore patterns
+
+- name: Create Git configuration directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ ansible_env.HOME }}/.config/git"
+
+- name: Deploy Git configuration template
+  template:
+    src: gitconfig.j2
+    dest: "{{ ansible_env.HOME }}/.gitconfig"
+    mode: "0644"
+    backup: true
+
+- name: Deploy Git global ignore file
+  copy:
+    src: git-ignore
+    dest: "{{ ansible_env.HOME }}/.config/git/ignore"
+    mode: "0644"
+    backup: true

@@ -1,0 +1,54 @@
+---
+- name: Get Homebrew prefix (macOS)
+  command: brew --prefix
+  register: homebrew_prefix_tools
+  changed_when: false
+  check_mode: false
+  when: ansible_os_family == "Darwin"
+
+- name: Set Homebrew prefix fact (macOS)
+  set_fact:
+    brew_prefix: "{{ homebrew_prefix_tools.stdout }}"
+  when: ansible_os_family == "Darwin" and homebrew_prefix_tools is defined
+
+- name: Create tool configuration directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ ansible_env.HOME }}/.config/zellij"
+    - "{{ ansible_env.HOME }}/.config/helix"
+    - "{{ ansible_env.HOME }}/.config/yazi"
+
+- name: Deploy Zellij configuration
+  copy:
+    src: zellij.kdl
+    dest: "{{ ansible_env.HOME }}/.config/zellij/config.kdl"
+    mode: "0644"
+    backup: true
+
+- name: Deploy Starship configuration
+  copy:
+    src: starship.toml
+    dest: "{{ ansible_env.HOME }}/.config/starship.toml"
+    mode: "0644"
+    backup: true
+
+- name: Deploy tool-specific zsh configurations
+  template:
+    src: "{{ item.src }}.j2"
+    dest: "{{ ansible_env.HOME }}/.config/zsh/{{ item.dest }}"
+    mode: "0644"
+  loop:
+    - { src: "starship.zsh", dest: "conf_61_starship.zsh" }
+    - { src: "zoxide.zsh", dest: "conf_62_zoxide.zsh" }
+    - { src: "fzf.zsh", dest: "conf_63_fzf.zsh" }
+    - { src: "terraform.zsh", dest: "conf_64_terraform.zsh" }
+
+- name: Deploy direnv zsh configuration
+  copy:
+    src: zsh-direnv.zsh
+    dest: "{{ ansible_env.HOME }}/.config/zsh/conf_65_direnv.zsh"
+    mode: "0644"
+    backup: true

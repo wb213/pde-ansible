@@ -1,0 +1,11 @@
+---
+# macOS modern development tools
+# These are CLI tools that work well on macOS
+
+tools_packages:
+  - git        # Latest Git version (replaces system Git)
+  - helix      # Modern text editor
+  - zellij     # Modern terminal multiplexer  
+  - yazi       # Terminal file manager
+  - eza        # Modern ls replacement
+  - direnv     # Environment variable management per directory
