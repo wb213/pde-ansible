@@ -9,6 +9,9 @@ tools_packages:
   - yazi       # Terminal file manager (may need cargo install)
   - exa        # Modern ls replacement (note: 'exa' not 'eza' on older Ubuntu)
   - direnv     # Environment variable management per directory
+  - btop       # Modern top replacement with beautiful UI
+  - duf        # Modern df replacement with colors and charts
   
 # Note: Some modern tools may not be available in standard APT repos
 # Consider using snap, cargo, or adding third-party repositories
+# procs and dust may need cargo install on Debian/Ubuntu

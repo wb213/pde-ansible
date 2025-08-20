@@ -9,3 +9,7 @@ tools_packages:
   - yazi       # Terminal file manager
   - eza        # Modern ls replacement
   - direnv     # Environment variable management per directory
+  - procs      # Modern ps replacement with colors and search
+  - btop       # Modern top replacement with beautiful UI
+  - duf        # Modern df replacement with colors and charts
+  - dust       # Modern du replacement with tree visualization

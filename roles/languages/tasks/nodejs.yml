@@ -45,5 +45,4 @@
   shell: |
     source {{ ansible_env.HOME }}/.nvm/nvm.sh
     nvm alias default 18.13.0
-  changed_when: true
   failed_when: false

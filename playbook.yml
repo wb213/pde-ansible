@@ -56,7 +56,6 @@
       shell: |
         python3 -m pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
       register: pip_config
-      changed_when: true
       failed_when: pip_config.rc != 0
       when: use_china_mirrors | default(false)
 
