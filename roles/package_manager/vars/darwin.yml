@@ -6,7 +6,6 @@ homebrew_taps:
   - hashicorp/tap
   - lihaoyun6/tap
   - noahgorstein/tap
-  - peak/tap
 
 # Foundation system packages - core utilities and infrastructure
 homebrew_packages:
@@ -17,14 +16,12 @@ homebrew_packages:
   - fastfetch # System information display
   - fd # Better find
   - ffmpeg # Media processing
-  - gpgme # GPG encryption
   - hashicorp/tap/terraform # Infrastructure as code
   - jq # JSON processor
   - kubernetes-cli # Kubernetes command line
   - neovim # Text editor (legacy, will be replaced by helix)
   - noahgorstein/tap/jqp # Interactive jq
   - pandoc # Document converter
-  - peak/tap/s5cmd # S3 command line tool
   - ripgrep # Better grep
   - rmlint # Duplicate file finder
   - rust # Rust programming language and toolchain
