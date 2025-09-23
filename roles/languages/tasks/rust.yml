@@ -62,6 +62,20 @@
   changed_when: "'installed' in rustup_default_result.stdout or 'downloading' in rustup_default_result.stdout"
   when: rust_check.rc != 0 or (ansible_os_family == "Darwin" and homebrew_rustup_check.rc != 0)
 
+- name: Link system Rust toolchain (macOS)
+  shell: |
+    export PATH="{{ ansible_env.HOME }}/.cargo/bin:${PATH}"
+    if command -v brew >/dev/null 2>&1 && brew list rustup >/dev/null 2>&1; then
+        export PATH="$(brew --prefix rustup)/bin:${PATH}"
+    fi
+    rustup toolchain link system "$(brew --prefix rust)"
+  register: rustup_link_result
+  changed_when: "'linked' in rustup_link_result.stdout"
+  failed_when: false
+  when: 
+    - ansible_os_family == "Darwin"
+    - homebrew_rust_check.rc == 0
+
 - name: Set Rust environment variables in shell config
   blockinfile:
     path: "{{ ansible_env.HOME }}/.config/zsh/conf_55_rust.zsh"
