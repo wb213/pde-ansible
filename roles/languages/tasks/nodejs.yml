@@ -26,23 +26,23 @@
     dest: "{{ ansible_env.HOME }}/.config/zsh/conf_52_nvm.zsh"
     mode: "0644"
 
-- name: Check if Node.js 18.13.0 is installed
+- name: Check if Node.js 22.19.0 is installed
   shell: |
     source {{ ansible_env.HOME }}/.nvm/nvm.sh
-    nvm list | grep -q "v18.13.0"
-  register: node18_check
+    nvm list | grep -q "v22.19.0"
+  register: node22_check
   failed_when: false
   changed_when: false
 
-- name: Install Node.js 18.13.0 via NVM
+- name: Install Node.js 22.19.0 via NVM
   shell: |
     source {{ ansible_env.HOME }}/.nvm/nvm.sh
-    nvm install 18.13.0
-  when: node18_check.rc != 0
+    nvm install 22.19.0
+  when: node22_check.rc != 0
   failed_when: false
 
-- name: Set default Node.js version to 18.13.0
+- name: Set default Node.js version to 22.19.0
   shell: |
     source {{ ansible_env.HOME }}/.nvm/nvm.sh
-    nvm alias default 18.13.0
+    nvm alias default 22.19.0
   failed_when: false
