@@ -1,12 +1,40 @@
 # Personal Development Environment - NVM Configuration
-# Node.js Version Manager - Updated for Q CLI MCP server compatibility
+# Node.js Version Manager
 
 export NVM_DIR="${HOME}/.nvm"
 
-# Load NVM immediately for MCP server compatibility
-# Q CLI MCP servers need Node.js to be available at shell startup
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+# Use zsh-defer if available, otherwise use function wrappers
+if (( ${+functions[zsh-defer]} )); then
+    # Defer NVM loading completely
+    zsh-defer source "$NVM_DIR/nvm.sh"
+    zsh-defer source "$NVM_DIR/bash_completion"
+else
+    # Fallback: Lazy load NVM with function wrappers
+    nvm() {
+        unset -f nvm node npm npx
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+        nvm "$@"
+    }
 
-# Ensure Node.js 22.19.0 is used by default for MCP compatibility
-nvm use 22.19.0 > /dev/null 2>&1
+    node() {
+        unset -f nvm node npm npx
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+        node "$@"
+    }
+
+    npm() {
+        unset -f nvm node npm npx
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+        npm "$@"
+    }
+
+    npx() {
+        unset -f nvm node npm npx
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+        npx "$@"
+    }
+fi
