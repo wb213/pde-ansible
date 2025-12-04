@@ -2,31 +2,31 @@
 - name: Deploy core Zsh configuration template
   template:
     src: zshrc_core.j2
-    dest: "{{ ansible_env.HOME }}/.zshrc"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.zshrc"
     mode: '0644'
     backup: true
 - name: Deploy Zsh profile template
   template:
     src: zprofile.j2
-    dest: "{{ ansible_env.HOME }}/.zprofile"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.zprofile"
     mode: '0644'
     backup: true
 - name: Create zsh config directory
   file:
-    path: "{{ ansible_env.HOME }}/.config/zsh"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/zsh"
     state: directory
     mode: '0755'
 
 - name: Deploy zinit configuration
   template:
     src: zinit.zsh.j2
-    dest: "{{ ansible_env.HOME }}/.config/zsh/conf_10_zinit.zsh"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/zsh/conf_10_zinit.zsh"
     mode: '0644'
 
 - name: Deploy static shell configuration files
   copy:
     src: "{{ item.src }}"
-    dest: "{{ ansible_env.HOME }}/.config/zsh/{{ item.dest }}"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/zsh/{{ item.dest }}"
     mode: '0644'
     backup: true
   loop:
@@ -37,6 +37,6 @@
 - name: Deploy private shell configuration template
   template:
     src: private.zsh.j2
-    dest: "{{ ansible_env.HOME }}/.config/zsh/conf_98_private.zsh"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/zsh/conf_98_private.zsh"
     mode: '0644'
     backup: true

@@ -17,8 +17,8 @@
     state: directory
     mode: "0755"
   loop:
-    - "{{ ansible_env.HOME }}/.local/share"
-    - "{{ ansible_env.HOME }}/.local/share/zinit"
+    - "{{ ansible_facts['env']['HOME'] }}/.local/share"
+    - "{{ ansible_facts['env']['HOME'] }}/.local/share/zinit"
 
 - name: Install Zinit (Zsh plugin manager)
   include_tasks: zinit.yml
@@ -35,7 +35,7 @@
 
 - name: Create nushell config directory (for future use)
   file:
-    path: "{{ ansible_env.HOME }}/.config/nushell"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/nushell"
     state: directory
     mode: "0755"
   when: nu_location.rc == 0

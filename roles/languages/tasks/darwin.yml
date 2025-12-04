@@ -2,7 +2,7 @@
 # macOS-specific language environment setup
 
 - name: Include platform-specific language variables
-  include_vars: "{{ ansible_os_family | lower }}.yml"
+  include_vars: "{{ ansible_facts['os_family'] | lower }}.yml"
 
 - name: Install language packages via Homebrew (macOS)
   community.general.homebrew:

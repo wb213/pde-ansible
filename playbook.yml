@@ -11,19 +11,19 @@
   pre_tasks:
     - name: Verify supported platform
       fail:
-        msg: "Unsupported platform: {{ ansible_os_family }}. Supported: Darwin, RedHat, Debian"
-      when: ansible_os_family not in ['Darwin', 'RedHat', 'Debian']
+        msg: "Unsupported platform: {{ ansible_facts['os_family'] }}. Supported: Darwin, RedHat, Debian"
+      when: ansible_facts['os_family'] not in ['Darwin', 'RedHat', 'Debian']
 
     - name: Display setup information and Manual confirmation before proceeding
       pause:
         prompt: |
           🚀 Setting up Personal Development Environment
 
-          User: {{ ansible_user_id }}
-          Platform: {{ ansible_os_family }}
-          Distribution: {{ ansible_distribution }}
-          Package Manager: {{ ansible_pkg_mgr }}
-          Home Directory: {{ ansible_env.HOME }}
+          User: {{ ansible_facts["user_id"] }}
+          Platform: {{ ansible_facts["os_family"] }}
+          Distribution: {{ ansible_facts["distribution"] }}
+          Package Manager: {{ ansible_facts["pkg_mgr"] }}
+          Home Directory: {{ ansible_facts["env"]["HOME"] }}
           Git User: {{ git_user_name }} <{{ git_user_email }}>
           Setup China Mirrors: {{ use_china_mirrors }}
           Install Rust: {{ install_rust }}
@@ -31,7 +31,7 @@
           ⚠️  Please review the setup information above carefully.
 
           This playbook will:
-          • Install/update packages via {{ ansible_pkg_mgr }}
+          • Install/update packages via {{ ansible_facts["pkg_mgr"] }}
           • Configure shell environment (zsh + nushell)
           • Install development tools and languages
           • Deploy configuration files to your home directory
@@ -61,7 +61,7 @@
 
     - name: Create uv config directory
       file:
-        path: "{{ ansible_env.HOME }}/.config/uv"
+        path: "{{ ansible_facts['env']['HOME'] }}/.config/uv"
         state: directory
         mode: "0755"
       when: use_china_mirrors | default(false)
@@ -72,7 +72,7 @@
           [[index]]
           url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/"
           default = true
-        dest: "{{ ansible_env.HOME }}/.config/uv/uv.toml"
+        dest: "{{ ansible_facts['env']['HOME'] }}/.config/uv/uv.toml"
         mode: "0644"
         backup: true
       when: use_china_mirrors | default(false)
@@ -83,24 +83,24 @@
       register: homebrew_check
       failed_when: false
       changed_when: false
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install Homebrew (macOS)
       shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      when: ansible_os_family == "Darwin" and homebrew_check.rc != 0
+      when: ansible_facts['os_family'] == "Darwin" and homebrew_check.rc != 0
       register: homebrew_install
       failed_when: homebrew_install.rc != 0
 
     - name: Update Homebrew to latest (macOS)
       community.general.homebrew:
         update_homebrew: true
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Update package cache (Linux)
       package:
         update_cache: true
       become: true
-      when: ansible_os_family in ['RedHat', 'Debian']
+      when: ansible_facts['os_family'] in ['RedHat', 'Debian']
       register: cache_update
       failed_when: cache_update.failed
 
@@ -109,7 +109,7 @@
         name: epel-release
         state: present
       become: true
-      when: ansible_distribution in ['RedHat', 'CentOS']
+      when: ansible_facts['distribution'] in ['RedHat', 'CentOS']
       register: epel_install
       failed_when: epel_install.failed
 
@@ -142,34 +142,34 @@
       shell: |
         {
           echo "# PDE Baseline Snapshot - Generated $(date)"
-          echo "# Platform: {{ ansible_os_family }}"
-          echo "# Distribution: {{ ansible_distribution }}"
-          echo "# User: {{ ansible_user_id }}"
-          echo "# Home: {{ ansible_env.HOME }}"
+          echo "# Platform: {{ ansible_facts['os_family'] }}"
+          echo "# Distribution: {{ ansible_facts['distribution'] }}"
+          echo "# User: {{ ansible_facts['user_id'] }}"
+          echo "# Home: {{ ansible_facts['env']['HOME'] }}"
           echo ""
 
           echo "=== HOMEBREW_PACKAGES ==="
-          {% if ansible_os_family == "Darwin" %}
+          {% if ansible_facts['os_family'] == "Darwin" %}
           brew list --formula | sort
           {% endif %}
 
           echo "=== HOMEBREW_CASKS ==="
-          {% if ansible_os_family == "Darwin" %}
+          {% if ansible_facts['os_family'] == "Darwin" %}
           brew list --cask | sort
           {% endif %}
 
           echo "=== HOMEBREW_TAPS ==="
-          {% if ansible_os_family == "Darwin" %}
+          {% if ansible_facts['os_family'] == "Darwin" %}
           brew tap | sort
           {% endif %}
 
           echo "=== DNF_PACKAGES ==="
-          {% if ansible_os_family == "RedHat" %}
+          {% if ansible_facts['os_family'] == "RedHat" %}
           dnf list installed | awk 'NR>1 {print $1}' | sort
           {% endif %}
 
           echo "=== APT_PACKAGES ==="
-          {% if ansible_os_family == "Debian" %}
+          {% if ansible_facts['os_family'] == "Debian" %}
           dpkg-query -W -f='${Package}\n' | sort
           {% endif %}
 
@@ -224,7 +224,7 @@
           ✅ Personal Development Environment setup completed successfully!
 
           Installed and configured:
-          - Package manager ({{ ansible_pkg_mgr }})
+          - Package manager ({{ ansible_facts['pkg_mgr'] }})
           - Shell environment (Zsh + Zinit + plugins)
           - Modern development tools
           - Configuration files and dotfiles

@@ -2,7 +2,7 @@
 # macOS-specific tools installation and configuration
 
 - name: Include platform-specific tool variables
-  include_vars: "{{ ansible_os_family | lower }}.yml"
+  include_vars: "{{ ansible_facts['os_family'] | lower }}.yml"
 
 - name: Install tools via Homebrew (macOS)
   community.general.homebrew:

@@ -9,14 +9,14 @@
     gpgcheck: true
     enabled: true
   become: true
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['os_family'] == "RedHat"
 
 - name: Add Amazon Corretto GPG key (RHEL/Fedora)
   rpm_key:
     key: https://yum.corretto.aws/corretto.key
     state: present
   become: true
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['os_family'] == "RedHat"
 
 - name: Add Amazon Corretto repository (Debian/Ubuntu)
   apt_repository:
@@ -24,11 +24,11 @@
     state: present
     update_cache: true
   become: true
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
 
 - name: Add Amazon Corretto GPG key (Debian/Ubuntu)
   apt_key:
     url: https://apt.corretto.aws/corretto.key
     state: present
   become: true
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"

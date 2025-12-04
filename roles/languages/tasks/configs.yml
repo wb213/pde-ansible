@@ -7,12 +7,12 @@
     state: directory
     mode: '0755'
   loop:
-    - "{{ ansible_env.HOME }}/.config/nodejs"
-    - "{{ ansible_env.HOME }}/.config/go"
-    - "{{ ansible_env.HOME }}/.config/java"
-    - "{{ ansible_env.HOME }}/.config/python"
-    - "{{ ansible_env.HOME }}/.config/rust"
-    - "{{ ansible_env.HOME }}/.config/zsh"
+    - "{{ ansible_facts['env']['HOME'] }}/.config/nodejs"
+    - "{{ ansible_facts['env']['HOME'] }}/.config/go"
+    - "{{ ansible_facts['env']['HOME'] }}/.config/java"
+    - "{{ ansible_facts['env']['HOME'] }}/.config/python"
+    - "{{ ansible_facts['env']['HOME'] }}/.config/rust"
+    - "{{ ansible_facts['env']['HOME'] }}/.config/zsh"
 
 - name: Create development workspace directories
   file:
@@ -20,9 +20,9 @@
     state: directory
     mode: '0755'
   loop:
-    - "{{ ansible_env.HOME }}/dev"
-    - "{{ ansible_env.HOME }}/dev/go"
-    - "{{ ansible_env.HOME }}/dev/java"
-    - "{{ ansible_env.HOME }}/dev/python"
-    - "{{ ansible_env.HOME }}/dev/rust"
-    - "{{ ansible_env.HOME }}/dev/nodejs"
+    - "{{ ansible_facts['env']['HOME'] }}/dev"
+    - "{{ ansible_facts['env']['HOME'] }}/dev/go"
+    - "{{ ansible_facts['env']['HOME'] }}/dev/java"
+    - "{{ ansible_facts['env']['HOME'] }}/dev/python"
+    - "{{ ansible_facts['env']['HOME'] }}/dev/rust"
+    - "{{ ansible_facts['env']['HOME'] }}/dev/nodejs"

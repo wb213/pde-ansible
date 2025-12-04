@@ -4,31 +4,31 @@
 
 - name: Check if NVM repository exists
   stat:
-    path: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+    path: "{{ ansible_facts['env']['HOME'] }}/.nvm/nvm.sh"
   register: nvm_installed
 
 - name: Clone NVM repository (manual installation)
   git:
     repo: https://github.com/nvm-sh/nvm.git
-    dest: "{{ ansible_env.HOME }}/.nvm"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.nvm"
     version: v0.40.3
   when: not nvm_installed.stat.exists
 
 - name: Verify NVM installation
   stat:
-    path: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+    path: "{{ ansible_facts['env']['HOME'] }}/.nvm/nvm.sh"
   register: nvm_verify
   failed_when: not nvm_verify.stat.exists
 
 - name: Deploy NVM zsh configuration
   template:
     src: nvm.zsh.j2
-    dest: "{{ ansible_env.HOME }}/.config/zsh/conf_52_nvm.zsh"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/zsh/conf_52_nvm.zsh"
     mode: "0644"
 
 - name: Check if Node.js 22.19.0 is installed
   shell: |
-    source {{ ansible_env.HOME }}/.nvm/nvm.sh
+    source {{ ansible_facts['env']['HOME'] }}/.nvm/nvm.sh
     nvm list | grep -q "v22.19.0"
   register: node22_check
   failed_when: false
@@ -36,13 +36,13 @@
 
 - name: Install Node.js 22.19.0 via NVM
   shell: |
-    source {{ ansible_env.HOME }}/.nvm/nvm.sh
+    source {{ ansible_facts['env']['HOME'] }}/.nvm/nvm.sh
     nvm install 22.19.0
   when: node22_check.rc != 0
   failed_when: false
 
 - name: Set default Node.js version to 22.19.0
   shell: |
-    source {{ ansible_env.HOME }}/.nvm/nvm.sh
+    source {{ ansible_facts['env']['HOME'] }}/.nvm/nvm.sh
     nvm alias default 22.19.0
   failed_when: false

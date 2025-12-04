@@ -20,23 +20,23 @@
   register: claude_code_result
   failed_when: false
 
-# Amazon Q CLI Installation for Linux (macOS handled by gui_apps cask)
-- name: Check if Amazon Q CLI is already installed (Linux)
-  command: q --version
-  register: amazon_q_check
+# Kiro CLI Installation for Linux (macOS handled by gui_apps cask)
+- name: Check if Kiro CLI is already installed (Linux)
+  command: kiro-cli --version
+  register: kiro-cli-check
   failed_when: false
   changed_when: false
-  when: ansible_os_family in ["RedHat", "Debian"]
+  when: ansible_facts['os_family'] in ["RedHat", "Debian"]
 
-- name: Install Amazon Q CLI on Ubuntu/Debian
+- name: Install Kiro CLI on Ubuntu/Debian
   block:
-    - name: Download Amazon Q CLI deb package
+    - name: Download Kiro CLI deb package
       get_url:
         url: "https://desktop-release.q.us-east-1.amazonaws.com/latest/amazon-q.deb"
         dest: "/tmp/amazon-q.deb"
         mode: "0644"
 
-    - name: Install Amazon Q CLI deb package
+    - name: Install Kiro CLI deb package
       apt:
         deb: "/tmp/amazon-q.deb"
         state: present
@@ -46,9 +46,9 @@
       file:
         path: "/tmp/amazon-q.deb"
         state: absent
-  when: ansible_os_family == "Debian" and amazon_q_check.rc != 0
+  when: ansible_facts['os_family'] == "Debian" and kiro-cli-check.rc != 0
 
-- name: Install Amazon Q CLI on RHEL/Fedora (via zip)
+- name: Install Kiro CLI on RHEL/Fedora (via zip)
   block:
     - name: Check glibc version
       command: ldd --version
@@ -72,30 +72,30 @@
             {%- endif -%}
           {%- endif -%}
 
-    - name: Create temporary directory for Amazon Q CLI
+    - name: Create temporary directory for Kiro CLI
       tempfile:
         state: directory
         suffix: amazon_q_cli
       register: temp_q_dir
 
-    - name: Download Amazon Q CLI zip
+    - name: Download Kiro CLI zip
       get_url:
         url: "{{ amazon_q_url }}"
         dest: "{{ temp_q_dir.path }}/q.zip"
         mode: "0644"
 
-    - name: Extract Amazon Q CLI
+    - name: Extract Kiro CLI
       unarchive:
         src: "{{ temp_q_dir.path }}/q.zip"
         dest: "{{ temp_q_dir.path }}"
         remote_src: true
-    - name: Run Amazon Q CLI installer
+    - name: Run Kiro CLI installer
       command: "{{ temp_q_dir.path }}/q/install.sh"
       environment:
-        HOME: "{{ ansible_env.HOME }}"
+        HOME: "{{ ansible_facts['env']['HOME'] }}"
 
     - name: Clean up temporary files
       file:
         path: "{{ temp_q_dir.path }}"
         state: absent
-  when: ansible_os_family == "RedHat" and amazon_q_check.rc != 0
+  when: ansible_facts['os_family'] == "RedHat" and kiro-cli-check.rc != 0

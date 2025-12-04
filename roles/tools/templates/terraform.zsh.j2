@@ -5,10 +5,6 @@
 if command -v terraform >/dev/null 2>&1; then
     # Initialize zsh completion system first
     autoload -Uz compinit && compinit
-    autoload -U +X bashcompinit && bashcompinit
-{% if ansible_os_family == "Darwin" %}
-    complete -o nospace -C {{ brew_prefix }}/bin/terraform terraform
-{% else %}
-    complete -o nospace -C terraform terraform
-{% endif %}
+    # Use terraform's native zsh completion
+    terraform -install-autocomplete 2>/dev/null || true
 fi

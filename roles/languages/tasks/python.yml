@@ -19,12 +19,12 @@
     state: directory
     mode: '0755'
   loop:
-    - "{{ ansible_env.HOME }}/.config/python"
-    - "{{ ansible_env.HOME }}/dev/python"
+    - "{{ ansible_facts['env']['HOME'] }}/.config/python"
+    - "{{ ansible_facts['env']['HOME'] }}/dev/python"
 
 - name: Set Python environment variables in shell config
   blockinfile:
-    path: "{{ ansible_env.HOME }}/.config/zsh/conf_51_python.zsh"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/zsh/conf_51_python.zsh"
     create: true
     block: |
       # Python development environment
@@ -43,6 +43,6 @@
 
 - name: Create UV cache directory
   file:
-    path: "{{ ansible_env.HOME }}/.cache/uv"
+    path: "{{ ansible_facts['env']['HOME'] }}/.cache/uv"
     state: directory
     mode: '0755'

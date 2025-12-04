@@ -3,4 +3,4 @@
 
 - name: Setup macOS GUI applications and fonts
   include_tasks: darwin.yml
-  when: ansible_os_family == "Darwin"
+  when: ansible_facts['os_family'] == "Darwin"

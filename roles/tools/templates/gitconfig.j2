@@ -9,4 +9,4 @@
     defaultbranch = main
 
 [core]
-    excludesfile = {{ ansible_env.HOME }}/.config/git/ignore
+    excludesfile = {{ ansible_facts['env']['HOME'] }}/.config/git/ignore

@@ -5,13 +5,14 @@
 homebrew_taps:
   - hashicorp/tap
   - lihaoyun6/tap
-  - noahgorstein/tap
+  - oven-sh/bun
 
 # Foundation system packages - core utilities and infrastructure
 homebrew_packages:
   - ansible # Infrastructure automation
   - awscli # AWS command line interface
   - bat # Better cat with syntax highlighting
+  - bun # JavaScript runtime and toolkit
   - cloud-nuke # AWS resource cleanup
   - fastfetch # System information display
   - fd # Better find
@@ -20,7 +21,7 @@ homebrew_packages:
   - jq # JSON processor
   - kubernetes-cli # Kubernetes command line
   - neovim # Text editor (legacy, will be replaced by helix)
-  - noahgorstein/tap/jqp # Interactive jq
+  - jqp # Interactive jq
   - pandoc # Document converter
   - ripgrep # Better grep
   - rmlint # Duplicate file finder

@@ -14,6 +14,9 @@ gui_apps_casks:
   - ghostty # Modern terminal emulator
   - wezterm # Terminal emulator
 
+  # Database
+  - dbeaver-community
+  
   # AI tools
   - amazon-q # Amazon Q Developer IDE
   - claude-code
